@@ -5,10 +5,9 @@ This is an exercise I completed while learning React. It recognizes where a face
 
 * Clone this repository
 * Run `npm install`
-* Register for your free API key at https://portal.clarifai.com/signup
-* Create a file named __.env.development.local__ in your project's root.
-	* Inside that file, add the following line, replacing "12345" with your API key:
-		`REACT_APP_CLARIFAI_API_KEY=12345`
+* Download and install [smart-brain-api](https://github.com/paulmiller3000/smart-brain-api)
+* Rename __.env.development.local.sample__ to __.env.development.local__.
+	* Inside that file, replace "3000" with your smart-brain-api port, if necessary
 * Run `npm start`
 
 ## Acknowledgments

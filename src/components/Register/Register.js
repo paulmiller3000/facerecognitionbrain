@@ -23,7 +23,8 @@ class Register extends React.Component {
 	}
 
 	onSubmitRegister = () => {
-		fetch('http://localhost:3000/register', {
+		const smartBrainAPIPort = process.env.REACT_APP_SMART_BRAIN_API_PORT; 
+		fetch(`http://localhost:${smartBrainAPIPort}/register`, {
 			method: 'post',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -34,15 +35,14 @@ class Register extends React.Component {
 		})
 		.then(response => response.json())
 		.then(user => {
-			if (user) {
+			if (user.id) {
 				this.props.loadUser(user);
 				this.props.onRouteChange('home');	
 			}
 		})
 	}
 
-	render() {
-		const { onRouteChange } = this.props;
+	render() {		
 		return (
 			<article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center">
 				<main className="pa4 black-80">
