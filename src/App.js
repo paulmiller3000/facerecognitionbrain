@@ -13,7 +13,7 @@ import './App.css';
 const clarifaiAPIKey = process.env.REACT_APP_CLARIFAI_API_KEY;
 
 const app = new Clarifai.App({
-  apiKey: process.env.REACT_APP_CLARIFAI_API_KEY
+  apiKey: clarifaiAPIKey
 });
 
 const particlesOptions = {
@@ -81,12 +81,12 @@ class App extends Component {
   onButtonSubmit = () => {
     this.setState({imageUrl: this.state.input});
     app.models
-      .predict(
-          Clarifai.FACE_DETECT_MODEL, 
+      .predict({
+          id: 'FACE_DETECT_MODEL'},
           this.state.input)
       .then(response => {
         if (response) {
-          fetch('http://localhost:3001/image', {
+          fetch('http://localhost:3000/image', {
             method: 'put',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
