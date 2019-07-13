@@ -9,7 +9,8 @@ import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
 import './App.css';
 
-const smartBrainAPIPort = process.env.REACT_APP_SMART_BRAIN_API_PORT;
+const smartBrainAPIHost = process.env.REACT_APP_API_HOST;
+const smartBrainHost = process.env.REACT_APP_HOST;
 
 const particlesOptions = {
   particles: {
@@ -77,7 +78,7 @@ class App extends Component {
 
   onButtonSubmit = () => {
     this.setState({imageUrl: this.state.input});    
-      fetch(`http://localhost:${smartBrainAPIPort}/imageurl`, {
+      fetch(`${smartBrainHost}/imageurl`, {
         method: 'post',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -87,7 +88,7 @@ class App extends Component {
       .then(response => response.json())
       .then(response => {
         if (response) {
-          fetch('http://localhost:3000/image', {
+          fetch(`${smartBrainAPIHost}/image`, {
             method: 'put',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
