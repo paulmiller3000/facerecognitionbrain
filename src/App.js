@@ -7,6 +7,7 @@ import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
+import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
 
 const smartBrainAPIHost = process.env.REACT_APP_API_HOST;
@@ -123,7 +124,9 @@ class App extends Component {
         <Particles className='particles'
           params={particlesOptions} 
         />
-        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
+        <ErrorBoundary>
+          <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
+        </ErrorBoundary>
         { route === 'home' 
           ? <div>
               <Logo />
