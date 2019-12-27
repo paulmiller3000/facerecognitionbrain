@@ -7,11 +7,9 @@ import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
-import ErrorBoundary from './components/ErrorBoundary';
+import Modal from './components/Modal/Modal';
+import Profile from './components/Profile/Profile';
 import './App.css';
-
-const smartBrainAPIHost = process.env.REACT_APP_API_HOST;
-const smartBrainHost = process.env.REACT_APP_HOST;
 
 const particlesOptions = {
   particles: {
@@ -31,12 +29,15 @@ const initialState = {
   box: {},
   route: 'signin',
   isSignedIn: false,
+  isProfileOpen: false,
   user: {
     id: '',
     name: '',        
     email: '',
     entries: 0,
-    joined: ''
+    joined: '',
+    pet: '',
+    age: ''
   }  
 }
 
@@ -78,8 +79,8 @@ class App extends Component {
   }
 
   onButtonSubmit = () => {
-    this.setState({imageUrl: this.state.input});    
-      fetch(`${smartBrainHost}/imageurl`, {
+    this.setState({imageUrl: this.state.input});
+      fetch('http://localhost:3001/imageurl', {
         method: 'post',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -89,7 +90,7 @@ class App extends Component {
       .then(response => response.json())
       .then(response => {
         if (response) {
-          fetch(`${smartBrainAPIHost}/image`, {
+          fetch('http://localhost:3001/image', {
             method: 'put',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -110,26 +111,42 @@ class App extends Component {
 
   onRouteChange = (route) => {
     if (route === 'signout') {
-      this.setState(initialState);
+      return this.setState(initialState);
     } else if (route === 'home') {
       this.setState({isSignedIn: true})
     }
     this.setState({route: route});
   }
 
+  toggleModal = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      isProfileOpen: !prevState.isProfileOpen
+    }))
+  }
+
   render() {
-    const { isSignedIn, imageUrl, route, box } = this.state;
+    const { isSignedIn, imageUrl, route, box, isProfileOpen, user } = this.state;
     return (
       <div className="App">
         <Particles className='particles'
           params={particlesOptions} 
         />
-        <ErrorBoundary>
-          <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
-        </ErrorBoundary>
-        { route === 'home' 
+        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} 
+          toggleModal={this.toggleModal} />
+          { isProfileOpen && 
+            <Modal>
+              <Profile 
+                isProfileOpen={isProfileOpen} 
+                toggleModal={this.toggleModal}
+                user={user}
+              />
+            </Modal>
+          }
+          { route === 'home' 
           ? <div>
               <Logo />
+
               <Rank name={this.state.user.name} entries={this.state.user.entries} />
               <ImageLinkForm 
                 onInputChange={this.onInputChange} 
