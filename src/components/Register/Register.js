@@ -23,8 +23,7 @@ class Register extends React.Component {
 	}
 
 	onSubmitRegister = () => {
-		const smartBrainAPIPort = process.env.REACT_APP_SMART_BRAIN_API_PORT; 
-		fetch(`http://localhost:${smartBrainAPIPort}/register`, {
+		fetch(`${process.env.REACT_APP_API_HOST}/register`, {
 			method: 'post',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({

@@ -47,6 +47,39 @@ class App extends Component {
     this.state = initialState;
   }
 
+  componentDidMount() {
+    const token = window.sessionStorage.getItem('token');
+    if (token) {
+      fetch(`${process.env.REACT_APP_API_HOST}/signin`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        }
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if (data && data.id) {
+          fetch(`${process.env.REACT_APP_API_HOST}/profile/${data.id}`, {
+            method: 'get',
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          }
+        })
+          .then(resp => resp.json())
+          .then(user => {
+            if (user && user.email) {
+              this.loadUser(user)
+              this.onRouteChange('home')
+            }
+          })
+        }
+      })
+      .catch(console.log)
+    }
+  }
+
   loadUser = (data) => {
     this.setState({user: {
       id: data.id,
@@ -58,20 +91,25 @@ class App extends Component {
   }
 
   calculateFaceLocation = (data) => {
-    const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
-    const image = document.getElementById('inputImage');
-    const width = Number(image.width);
-    const height = Number(image.height);
-    return {
-      leftCol: clarifaiFace.left_col * width,
-      topRow: clarifaiFace.top_row * height,
-      rightCol: width - (clarifaiFace.right_col * width),
-      bottomRow: height - (clarifaiFace.bottom_row * height)
-    }    
+    if (data && data.outputs) {
+      const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+      const image = document.getElementById('inputImage');
+      const width = Number(image.width);
+      const height = Number(image.height);
+      return {
+        leftCol: clarifaiFace.left_col * width,
+        topRow: clarifaiFace.top_row * height,
+        rightCol: width - (clarifaiFace.right_col * width),
+        bottomRow: height - (clarifaiFace.bottom_row * height)
+      } 
+    }
+    return;
   }
 
   displayFaceBox = (box) => {
-    this.setState({box: box});
+    if (box) {
+      this.setState({box: box});  
+    }    
   }
 
   onInputChange = (event) => {
@@ -80,9 +118,12 @@ class App extends Component {
 
   onButtonSubmit = () => {
     this.setState({imageUrl: this.state.input});
-      fetch('http://localhost:3001/imageurl', {
+      fetch(`${process.env.REACT_APP_API_HOST}/imageurl`, {
         method: 'post',
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': window.sessionStorage.getItem('token')
+        },
         body: JSON.stringify({
           input: this.state.input
         })
@@ -90,9 +131,12 @@ class App extends Component {
       .then(response => response.json())
       .then(response => {
         if (response) {
-          fetch('http://localhost:3001/image', {
+          fetch(`${process.env.REACT_APP_API_HOST}/image`, {
             method: 'put',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': window.sessionStorage.getItem('token')
+            },
             body: JSON.stringify({
               id: this.state.user.id
             })
@@ -139,6 +183,7 @@ class App extends Component {
               <Profile 
                 isProfileOpen={isProfileOpen} 
                 toggleModal={this.toggleModal}
+                loadUser={this.loadUser}
                 user={user}
               />
             </Modal>
